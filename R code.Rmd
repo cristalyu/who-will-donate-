@@ -1,0 +1,180 @@
+---
+title: "Who will donate? A study on Canadian donation statistics"
+author: "Yu Yuan, Taojun Wang, Biwen Zheng"
+date: "October 17, 2020"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Executive Summary 
+
+Donation is a blessing and a gift for charitable purpose. In this study, we investigate the Canadian donation statistics and observe some interesting pattern of donors, that is, older, rich widow or widower with a high education level, are more generous and enthusiastic on donation. The reason of this scenario could be that the young and families are limited on financial ability. Additionally, we discuss about further modification by considering the total number of children as a factor that might be associated with the amount of donate value. 
+
+
+
+## Introduction
+
+Our research focus is the donation of Canadians in 2013. A person’s donation choice can be influenced by many factors, including household income, education, gender, religious faith and so on. Some of them will decide whether people donate or not, and some others might affect the amount people finally donate. Our report is aimed to figure out how these factors determine people’s donation choice, and construct a prediction model based on the data. We hope the model can explain and predict people’s donation behavior, which might help charity organizations to target their donors. We expect that our model will help organizations to target middle-upper class families in their 40s with higher education. They usually have a successful life and generous attitude to give back to the community. We expect the single to donate the least as they are mostly young and with limited financial ability. 
+
+## Methodology
+
+The target population is all Canadian citizens and permanent residents aged 15 or older. To sample, the survey uses telephone questionnaires to get responses from only one eligible member from each household. Voluntary participants will get a long interview, while the non-voluntary ones will be divided into two groups, among whom will get long and short interviews respectively. The survey sampling is based on a stratified design, where each province is a stratum. Since different provinces have quite different populations and patterns of donor behavior, stratified sampling ensures that our sample can well represent the target population. The survey question includes their age group, gender, marital status, education level, labor force status, household income and religious attendance. Participants will be divided into different groups according to their answers to each question, and the average annual donations will be calculated. We will use the linear regression model to fit our data, and find the relationship between the average annual donations and those variables. 
+
+We consider to constrcut multiple linear regressions with a response variable as donate value and a single variable we are interested. For instance, for discovering the relationship between Sex and donate value, we have a model as 
+
+$$
+log（Value_i） = \beta_0 + \beta_1Sex_i
+$$
+
+## Results
+
+The average value of donation is 253.13 CAD, and the median value is 83.70 CAD. The histrogram of original donation values show that it is a highly right skewed distribution with sufficient outliers that may affect our later modeling. Therefore, we transformed our original donation values by taking logarithm. The distribution for new response variable is approximately bell shaped from the second figure. Additionally, we can obtain that most sampled people's donation amount is in the range from 42.52 CAD to 148.41 CAD. Furthermore, people aged from 35 to 65 donate the most, and on average the amount that people donate increases linearly as the age increases. The average annual donations of male is 20% more than that of females, but for low-amount donors, genders make very little difference. Also, females, compared to male, seem to be more enthusiastic to donate (higher donor rate). In terms of education, people with higher diplomas tend to donate more. For people who do not have a university degree (i.e. those who graduate from secondary school or less, who graduate from high school or other post-secondary diplomas), the average annual donated value increases slightly and is still approximately in the same level. When a person gets a university degree, he is very likely to donate much more than those who do not. In addition,  Household income influence affects people’s donation behavior. Median annual donations keeps increasing as the household income increases. The effect is relatively small and shows a linear pattern when the income is relatively low (< $12000). After reaching this threshold, donations begin to increase rapidly and approximately show an exponential pattern. Labor force status is another factor we study. People who are employed have the largest proportion of   donors, and highest annual donation value. People who are not in the labor force, including full-time students and retired people are closed to employed ones on average, and have a lower donor rate and larger distribution spread.
+
+Findings on the marital status variable shows people who lose their couples (i.e. widow or widower) tend to donate the most of all, however the cofficient is not statistically significant at $\alpha = 0.05$ level. Married people rank second in donation amount but they are most likely to donate of all. Divorced people rank third, and single people show the most negative attitude in donations. Finally, we find that there is no obvious difference in the amount of donation between people who have weekly religious attendance and people who do not regardless of the donor rate or the average donations.
+Generally, when a charity organization wants to target people with higher probability to donate, and with a larger tendency to donate generously. They should target an old, rich widow or widower with a high education level.
+
+
+
+
+## Weakness
+
+There are several weaknesses we find after constructing our model. First of all, the married ranked second after widow or widower. This is a bit of a surprise for us, as we expected that a happily married family would donate the most among all marital statuses. Thus, we concluded a few possible reasons why widow and widower donate more: they know the pain of losing someone, so they are more generous towards helping others so others’ loved ones won’t suffer the same tragedy; they might inherit some fortune from their deceased spouses, and spending the fortune on charity is a way of comforting themselves that they did good things with their deceased spouses’ fortune. Other than that, the single ranked last when donating, and this is consistent with our expectation. 
+
+Secondly, we think there should be another variable: number of kids they have. When people donate, they are helping someone or someone’s kids through a hard time. Sympathy is the best incentive for people to be generous. If someone with kids sees other kids in poverty living a struggling life, he/she is more likely to donate to the child charity organization to help out they way they can. 
+
+Last but not least, the p-value of most regression models we get is a bit large, which indicates a lack of linearity, so our model might not perform well in prediction. Since a lot of variables are categorical rather than quantitative, a linear regression model might not be a good choice to reveal the characteristics of data.
+
+
+## Reference 
+
+- Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43),
+  1686, https://doi.org/10.21105/joss.01686
+- General Social Survey: An Overview, 2019, Statistics Canada, https://www150.statcan.gc.ca/
+- Montgomery, D. C., Peck, E. A., & Vining, G. G. (2012). Introduction to linear regression analysis (Vol. 821). John Wiley & Sons.
+- Weisberg, S. (2005). Applied linear regression (Vol. 528). John Wiley & Sons
+- Hossain, B., & Lamb, L. (2012). Does the effectiveness of tax incentives on the decision to give charitable donations vary across donation sectors in Canada?. Applied Economics Letters, 19(15), 1487-1491.
+
+## Appendix 
+
+R codes 
+
+```{r}
+setwd("~/Desktop/Data/STA304")
+df_tc <- read.csv("donation data.csv")
+library(tidyverse)
+
+# Distribution of Donation
+
+df_tc %>% 
+  select(Value) %>% 
+  summary()
+
+df_tc %>% 
+  ggplot(mapping = aes( x = Value)) + 
+  geom_histogram(binwidth = 10) 
+
+df_tc %>% 
+  ggplot(mapping = aes( x = log(Value))) + 
+  geom_histogram(binwidth = 1) 
+
+# plot of donation on Age
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Age)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+# plot of donation on sex 
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Sex)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+
+# frequency table of donation on sex 
+df_tc %>%
+  group_by(Sex) %>% 
+  summarize(n = n(), Mean = mean(Value), Median = median(Value)) %>% 
+  mutate(freq = round(n / sum(n), 4))
+
+
+# plot of donation on education
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Education)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+
+# table of donation on eduction
+df_tc %>%
+  group_by(Education) %>% 
+  summarize(n = n(), Mean = mean(Value), Median = median(Value)) %>% 
+  mutate(freq = round(n / sum(n), 4))
+
+
+# plot of donation on Marital
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Marital)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+
+# table of donation on Marital
+df_tc %>%
+  group_by(Marital) %>% 
+  summarize(n = n(), Mean = mean(Value), Median = median(Value)) %>% 
+  mutate(freq = round(n / sum(n), 4))
+
+# plot of donation on income
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Income)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+
+# table of donation on income
+df_tc %>%
+  group_by(Income) %>% 
+  summarize(n = n(), Mean = mean(Value), Median = median(Value)) %>% 
+  mutate(freq = round(n / sum(n), 4))
+
+
+# plot of donation on Religious
+df_tc %>% 
+  ggplot(mapping = aes(x = log(Value), fill = Religious)) +
+  geom_histogram(binwidth = 1) + 
+  labs(x = "log(Value)",
+       y = "Count") 
+```
+
+
+
+$$
+log（Value_i） = \beta_0 + \beta_1Sex_i
+$$
+
+
+
+```{r}
+# single covariate model
+fit.sex <- lm(log(Value) ~ Sex, data = df_tc)
+summary(fit.sex)
+fit.age <- lm(log(Value) ~ Age, data = df_tc)
+summary(fit.age)
+fit.income <- lm(log(Value) ~ Income, data = df_tc)
+fit.income
+fit.m <- lm(log(Value) ~ Marital, data = df_tc)
+summary(fit.m)
+fit.e<- lm(log(Value) ~ Education, data = df_tc)
+summary(fit.e)
+fit.r <- lm(log(Value) ~ Religious, data = df_tc)
+summary(fit.r)
+```
+
+
